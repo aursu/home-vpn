@@ -1,0 +1,19 @@
+#!/bin/sh -e
+
+IFACE="$1"
+REMOTE="<<Gateway LAN IP>>"
+
+case "$5" in
+    # Handle the routing to the Megogo TV
+    $REMOTE)
+        # Megogo.net
+        ip route add 194.145.202.0/24 via $REMOTE dev $IFACE
+        # Megogo.net CDN
+        ip route add 193.187.76.0/22 via $REMOTE dev $IFACE
+        # Megogo.net TV
+        ip route add 185.192.250.0/23 via $REMOTE dev $IFACE
+    ;;
+    *)
+esac
+
+exit 0

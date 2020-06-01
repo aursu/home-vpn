@@ -1,0 +1,12 @@
+nodetach
+noipdefault
+nodefaultroute
+noauth
+noccp
+lcp-echo-failure 0
+lcp-echo-interval 0
+plugin /usr/lib/pppd/2.4.7/nm-l2tp-pppd-plugin.so
+mru 1400
+mtu 1400
+name <<VPNLOGIN>>
+password <<VPNSECRET>>
