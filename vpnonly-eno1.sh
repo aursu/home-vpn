@@ -1,7 +1,7 @@
 
 IFACE=eno1
-DNS=192.168.0.1
-LOCALNET=192.168.0.0/24
+DNS=192.168.178.1
+LOCALNET=192.168.178.0/24
 
 iptables -F
 iptables -X
@@ -25,7 +25,15 @@ sysctl net.ipv6.conf.all.disable_ipv6=1
 # nl2-ovpn.pointtoserver.com. 100	IN	A	188.72.98.4
 # nl2-ovpn.pointtoserver.com. 100	IN	A	172.94.19.4
 # nl2-ovpn.pointtoserver.com. 100	IN	A	178.170.137.4
-for p in 188.72.98.4 172.94.19.4 178.170.137.4; do 
+# bg2-ovpn.pointtoserver.com. 81	IN	A	37.120.152.52
+# usfl2-ovpn.pointtoserver.com. 74 IN	A	37.230.169.4
+# usfl2-ovpn.pointtoserver.com. 74 IN	A	172.94.108.4
+# tr2-ovpn.pointtoserver.com. 75	IN	A	172.94.49.4
+# ae2-ovpn.pointtoserver.com. 69	IN	A	104.37.6.4
+# de2-ovpn-tcp.pointtoserver.com. 100 IN  A       172.111.203.4
+# de2-ovpn-tcp.pointtoserver.com. 100 IN  A       46.243.238.4
+# de2-ovpn-tcp.pointtoserver.com. 100 IN  A       172.94.11.4
+for p in 188.72.98.4 172.94.19.4 178.170.137.4 37.120.152.52 37.230.169.4 172.94.108.4 172.94.49.4 104.37.6.4 172.111.203.4 46.243.238.4 172.94.11.4; do 
     iptables -A INPUT -s $p/32 -m state --state ESTABLISHED -j ACCEPT
     iptables -A OUTPUT -d $p/32 -p tcp -m tcp --dport 80 -j ACCEPT
 done
