@@ -8,7 +8,8 @@
 
 ### Details of implementation
 
-These settings do not accept VPN default gateway and VPN provider's routes. Therefore routing should be set manually in /etc/ppp/ip-up.d/ (see example for Ukrainian TV provider Megogo.net)
+These settings do not accept VPN default gateway and VPN provider's routes. Therefore routing should be set manually in `/etc/ppp/ip-up.d/` (see example for Ukrainian TV provider Megogo.net).
+
 Autoconnect is enabled
 
 ### Usage
