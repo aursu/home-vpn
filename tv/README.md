@@ -15,8 +15,10 @@ Autoconnect is enabled
 
 Tested on Ubuntu 20.04 on Raspberry PI 4:
 
-`systemctl start ipsec`
-`systemctl start xl2tpd`
+```
+systemctl start ipsec
+systemctl start xl2tpd
+```
 
 ### Drawback
 
