@@ -4,7 +4,6 @@ IFACE="$1"
 REMOTE="<<Gateway LAN IP>>"
 
 case "$5" in
-    # Handle the routing to the Megogo TV
     $REMOTE)
         iptables -t nat -C POSTROUTING -o $IFACE -j MASQUERADE && exit 0
         iptables -t nat -A POSTROUTING -o $IFACE -j MASQUERADE
