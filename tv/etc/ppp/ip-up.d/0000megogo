@@ -12,6 +12,11 @@ case "$5" in
         ip route add 193.187.76.0/22 via $REMOTE dev $IFACE
         # Megogo.net TV
         ip route add 185.192.250.0/23 via $REMOTE dev $IFACE
+ 	    # STB (UA)
+	    ip route add 91.223.19.0/24 via $REMOTE dev $IFACE
+        # player.starlight.digital
+	    ip route add 172.64.0.0/13 via $REMOTE dev $IFACE
+	    ip route add 104.16.0.0/12 via $REMOTE dev $IFACE
     ;;
     *)
 esac
