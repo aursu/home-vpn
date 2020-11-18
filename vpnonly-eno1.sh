@@ -1,19 +1,12 @@
 
 IFACE=eno1
-DNS=192.168.178.1
+DNS=(192.168.178.1 192.168.0.1)
 LOCALNET=192.168.178.0/24
-# nl2-ovpn.pointtoserver.com.       100 IN	A	188.72.98.4
-# nl2-ovpn.pointtoserver.com.       100 IN	A	172.94.19.4
-# nl2-ovpn.pointtoserver.com.       100 IN	A	178.170.137.4
-# bg2-ovpn.pointtoserver.com.       81  IN	A	37.120.152.52
-# usfl2-ovpn.pointtoserver.com.     74  IN	A	37.230.169.4
-# usfl2-ovpn.pointtoserver.com.     74  IN	A	172.94.108.4
-# tr2-ovpn.pointtoserver.com.       75  IN	A	172.94.49.4
-# ae2-ovpn.pointtoserver.com.       69  IN	A	104.37.6.4
-# de2-ovpn-tcp.pointtoserver.com.   100 IN  A   172.111.203.4
-# de2-ovpn-tcp.pointtoserver.com.   100 IN  A   46.243.238.4
-# de2-ovpn-tcp.pointtoserver.com.   100 IN  A   172.94.11.4
-VPNGWS=(188.72.98.4 172.94.19.4 178.170.137.4 37.120.152.52 37.230.169.4 172.94.108.4 172.94.49.4 104.37.6.4 172.111.203.4 46.243.238.4 172.94.11.4)
+
+# nl2-ovpn-tcp.pointtoserver.com.	114 IN	CNAME	nl2-tcp.ptoserver.com.
+# nl2-tcp.ptoserver.com.	114	IN	A	172.83.45.114
+# nl2-tcp.ptoserver.com.	108	IN	A	37.120.192.212
+VPNGWS=(5.254.73.171 172.83.45.114 37.120.192.212 37.120.192.220)
 
 iptables -F
 iptables -X
@@ -33,11 +26,15 @@ ip6tables -P FORWARD DROP
 sysctl net.ipv6.conf.default.disable_ipv6=1
 sysctl net.ipv6.conf.all.disable_ipv6=1
 
-# VPN gateways IPs
 for p in ${VPNGWS[@]}; do 
     iptables -A INPUT -s $p/32 -m state --state ESTABLISHED -j ACCEPT
     iptables -A OUTPUT -d $p/32 -p tcp -m tcp --dport 80 -j ACCEPT
 done
+
+#for n in 172.94.19.128/26; do
+#    iptables -A INPUT -s $n -m state --state ESTABLISHED -j ACCEPT
+#    iptables -A OUTPUT -d $n -p tcp -m tcp --dport 80 -j ACCEPT
+#done
 
 # allow loopback traffic
 iptables -A INPUT -i lo -j ACCEPT
@@ -48,8 +45,10 @@ iptables -A INPUT  -s $LOCALNET -i $IFACE -j ACCEPT
 iptables -A OUTPUT -d $LOCALNET -o $IFACE -j ACCEPT
 
 # DNS
-iptables -A INPUT  -i $IFACE -s $DNS -p udp -m udp --sport 53 -j ACCEPT
-iptables -A OUTPUT -o $IFACE -d $DNS -p udp -m udp --dport 53 -j ACCEPT
+for n in ${DNS[@]}; do
+    iptables -A INPUT  -i $IFACE -s $n -p udp -m udp --sport 53 -j ACCEPT
+    iptables -A OUTPUT -o $IFACE -d $n -p udp -m udp --dport 53 -j ACCEPT
+done
 
 # UPnP / Multicast
 iptables -A INPUT -s $LOCALNET -d 239.255.255.250 -p udp -m udp --dport 1900 -j ACCEPT
