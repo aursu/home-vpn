@@ -8,8 +8,10 @@ case "$5" in
     $REMOTE)
         # Megogo.net
         ip route add 194.145.202.0/24 via $REMOTE dev $IFACE
+        ip route add 193.142.213.0/24 via $REMOTE dev $IFACE
         # Megogo.net CDN
         ip route add 193.187.76.0/22 via $REMOTE dev $IFACE
+        ip route add 195.182.7.0/24 via $REMOTE dev $IFACE
         # Megogo.net TV
         ip route add 185.192.250.0/23 via $REMOTE dev $IFACE
         # STB (UA)
