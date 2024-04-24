@@ -11,4 +11,9 @@ openvpn --config "$config" \
         --setenv OPENSSL_ENABLE_MD5_VERIFY 1 \
         --daemon openvpn \
         --status /var/run/openvpn.status 5 --writepid /var/run/openvpn.pid \
-        --dev tun0
+        --route-nopull \
+        --dev tun0 \
+        --route-gateway dhcp \
+        --route 0.0.0.0 0.0.0.0 \
+        --up /root/vpn/vpnonly.sh \
+        --down /root/vpn/nofw.sh
