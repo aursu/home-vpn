@@ -14,7 +14,6 @@ openvpn --config "$config" \
         --dev tun0 \
         --route-nopull \
         --route-gateway dhcp \
-        --route-metric 100 \
         --route 0.0.0.0 0.0.0.0 \
         --up $(pwd)/vpnonly.sh \
         --down $(pwd)/down.sh
