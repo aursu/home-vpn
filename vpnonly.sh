@@ -17,7 +17,7 @@ if [ -n "$trusted_ip" ]; then
   VPNGWS=($trusted_ip)
 else
   # nl2-auto-tcp.ptoserver.com
-  VPNGWS=(5.254.15.92 185.2.30.225 37.46.122.83)
+  VPNGWS=(5.254.70.211 5.254.15.92 185.2.30.225 37.46.122.83)
 fi
 
 export PATH="/bin:/sbin:/usr/bin:/usr/sbin"
