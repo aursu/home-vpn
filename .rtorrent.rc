@@ -1,8 +1,36 @@
-# This is an example resource file for rTorrent. Copy to
-# ~/.rtorrent.rc and enable/modify the options as needed. Remember to
-# uncomment the options you wish to enable.
+#############################################################################
+# This is an (old) example resource file for rTorrent.
+# Copy to ~/.rtorrent.rc and enable/modify the options as needed.
+# Remember to uncomment the options you wish to enable.
+#
+# See 'rtorrent.rc-example' for a newer, basic configuration.
+#
+#   Sample: https://github.com/rakshasa/rtorrent/wiki/CONFIG-Template
+# Complete: https://rtorrent-docs.readthedocs.io/en/latest/cmd-ref.html
+#   Useful: https://rtorrent-docs.readthedocs.io/en/latest/use-cases.html
+#   Manual: https://rtorrent-docs.readthedocs.io/en/latest/
+#  Convert: https://github.com/rakshasa/rtorrent/wiki/rTorrent-0.9-Comprehensive-Command-list-(WIP)
+# Handbook: https://media.readthedocs.org/pdf/rtorrent-docs/latest/rtorrent-docs.pdf
+#     File: https://github.com/rakshasa/rtorrent/blob/master/doc/rtorrent.rc
+#############################################################################
 
-max_downloads_global = 8
+method.insert = cfg.basedir,  private|const|string, (cat,"/var/data/downloads/")
+method.insert = cfg.download, private|const|string, (cat,(cfg.basedir),"download/")
+method.insert = cfg.logs,     private|const|string, (cat,(cfg.basedir),"log/")
+method.insert = cfg.logfile,  private|const|string, (cat,(cfg.logs),"rtorrent-",(system.time),".log")
+method.insert = cfg.session,  private|const|string, (cat,(cfg.basedir),".rtorrent.session/")
+method.insert = cfg.watch,    private|const|string, (cat,(cfg.basedir),"watch/")
+
+
+# Create instance directories
+execute.throw = sh, -c, (cat,\
+    "mkdir -p \"",(cfg.download),"\" ",\
+    "\"",(cfg.logs),"\" ",\
+    "\"",(cfg.session),"\" ",\
+    "\"",(cfg.watch),"/load\" ",\
+    "\"",(cfg.watch),"/start\" ")
+
+throttle.max_downloads.global.set = 8
 
 # Maximum and minimum number of peers to connect to per torrent.
 #
@@ -15,94 +43,108 @@ max_downloads_global = 8
 throttle.min_peers.seed.set = 1
 throttle.max_peers.seed.set = 1
 
-# Maximum number of simultanious uploads per torrent.
+# Maximum number of simultaneous uploads per torrent.
+#
 throttle.max_uploads.set = 0
 throttle.max_uploads.global.set = 0
 
-# Global upload and download rate in KiB. "0" for unlimited.
-throttle.global_down.max_rate.set_kb = 0
-# 1 KiB
-throttle.global_up.max_rate.set_kb = 1
+# Global upload and download rate in KiB.
+# "0" for unlimited.
+#
+#throttle.global_down.max_rate.set_kb = 0
+#throttle.global_up.max_rate.set_kb = 1
 
 # Default directory to save the downloaded torrents.
-#directory.default.set = /var/data/downloads
-
-# gets the full path of data of a torrent (it's a workaround for the possibly empty 'd.base_path' attribute)
-method.insert = d.get_finished_dir, simple, "cat=/var/data/movies/,$d.custom1="
-method.insert = d.get_data_full_path, simple, "branch=((d.is_multi_file)),((cat,(d.directory))),((cat,(d.directory),/,(d.name)))"
-method.insert = d.move_to_complete, simple, "execute=mkdir,-p,$argument.1=; d.stop=; execute=mv,$argument.0=,$argument.1=; d.directory.set=$argument.1=; d.save_full_session="
-method.set_key = event.download.finished,move_complete,"d.move_to_complete=$d.get_data_full_path=,$d.get_finished_dir="
+#
+directory.default.set = (cat, (cfg.download))
+system.cwd.set = (directory.default)
 
 # Default session directory. Make sure you don't run multiple instance
-# of rtorrent using the same session directory. Perhaps using a
+# of rTorrent using the same session directory. Perhaps using a
 # relative path?
-session.path.set = /var/data/downloads/.rtorrent.session
-session.save = yes
+#
+session.path.set = (cat, (cfg.session))
 
-# Watch a directory for new torrents, and stop those that have been
-# deleted.
-#schedule = watch_directory,5,5,load_start=./watch/*.torrent
-#schedule = untied_directory,5,5,stop_untied=
+## Watch directories (add more as you like, but use unique schedule names)
+## Add torrent
+schedule2 = watch_load, 11, 10, ((load.verbose, (cat, (cfg.watch), "load/*.torrent")))
+## Add & download straight away
+schedule2 = watch_start, 10, 10, ((load.start_verbose, (cat, (cfg.watch), "start/*.torrent")))
 
-# Close torrents when diskspace is low.
-#schedule = low_diskspace,5,60,close_low_diskspace=100M
+# Close torrents when disk-space is low.
+#
+#schedule2 = low_diskspace,5,60,close_low_diskspace=100M
 
-# The ip address reported to the tracker.
-#ip = 127.0.0.1
-#ip = rakshasa.no
+# The IP address reported to the tracker.
+#
+#network.local_address.set = 127.0.0.1
+#network.local_address.set = rakshasa.no
 
-# The ip address the listening socket and outgoing connections is
+# The IP address the listening socket and outgoing connections is
 # bound to.
-#bind = 127.0.0.1
-#bind = rakshasa.no
+#
+#network.bind_address.set = 127.0.0.1
+#network.bind_address.set = rakshasa.no
 
 # Port range to use for listening.
+#
 network.port_range.set = 8080-8080
 
 # Start opening ports at a random position within the port range.
+#
 network.port_random.set = no
 
-# Check hash for finished torrents. Might be usefull until the bug is
-# fixed that causes lack of diskspace not to be properly reported.
-#check_hash = no
+# Check hash for finished torrents. Might be useful until the bug is
+# fixed that causes lack of disk-space not to be properly reported.
+#
+#pieces.hash.on_completion.set = no
 
 # Set whether the client should try to connect to UDP trackers.
-#use_udp_trackers = yes
+#
+#trackers.use_udp.set = yes
 
-# Alternative calls to bind and ip that should handle dynamic ip's.
-#schedule = ip_tick,0,1800,ip=rakshasa
-#schedule = bind_tick,0,1800,bind=rakshasa
+# Alternative calls to bind and IP that should handle dynamic IP's.
+#
+#schedule2 = ip_tick,0,1800,ip=rakshasa
+#schedule2 = bind_tick,0,1800,bind=rakshasa
 
 # Encryption options, set to none (default) or any combination of the following:
 # allow_incoming, try_outgoing, require, require_RC4, enable_retry, prefer_plaintext
 #
 # The example value allows incoming encrypted connections, starts unencrypted
 # outgoing connections but retries with encryption if they fail, preferring
-# plaintext to RC4 encryption after the encrypted handshake
+# plain-text to RC4 encryption after the encrypted handshake.
 #
-protocol.encryption.set = allow_incoming,enable_retry
+protocol.encryption.set = allow_incoming,try_outgoing,enable_retry
 
 # Enable DHT support for trackerless torrents or when all trackers are down.
 # May be set to "disable" (completely disable DHT), "off" (do not start DHT),
 # "auto" (start and stop DHT as needed), or "on" (start DHT immediately).
 # The default is "off". For DHT to work, a session directory must be defined.
-# 
-# dht = auto
-
-# UDP port to use for DHT. 
-# 
-# dht_port = 6881
-
-# Enable peer exchange (for torrents not marked private)
 #
-# peer_exchange = yes
+# dht.mode.set = auto
 
-# Enable the default ratio group.
-ratio.enable=
-# Change the limits, the defaults should be sufficient.
-# Upload to a minimum ratio of 0.001
-ratio.min.set=1
-# Upload to a maximum ratio of 0.001
-ratio.max.set=1
-# Upload a minimum of 1b
-ratio.upload.set=1b
+# UDP port to use for DHT.
+#
+#dht.port.set = 6881
+
+# Enable peer exchange (for torrents not marked private).
+#
+#protocol.pex.set = yes
+
+# Set download list layout style ("full", "compact").
+#
+#ui.torrent_list.layout.set = "full"
+
+# Run rTorrent as a daemon, controlled via XMLRPC.
+#
+#system.daemon.set = false
+
+# SCGI Connectivity (for alternative rtorrent interfaces, XMLRPC)
+# Use a IP socket with scgi_port, or a Unix socket with scgi_local.
+# schedule can be used to set permissions on the unix socket.
+#
+#network.scgi.open_port = "127.0.0.1:5000"
+#network.scgi.open_local = (cat,(session.path),/rpc.sock)
+#schedule2 = socket_chmod, 0, 0, "execute.nothrow=chmod,770,(cat,(session.path),/rpc.sock)"
+
