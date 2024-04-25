@@ -17,7 +17,7 @@ if [ -n "$trusted_ip" ]; then
   VPNGWS=($trusted_ip)
 else
   # nl2-auto-tcp.ptoserver.com
-  VPNGWS=(5.254.15.92 185.2.30.225)
+  VPNGWS=(5.254.15.92 185.2.30.225 37.46.122.83)
 fi
 
 export PATH="/bin:/sbin:/usr/bin:/usr/sbin"
@@ -61,9 +61,13 @@ iptables -A OUTPUT -d $NETWORK -o $DEVICE -j ACCEPT
 
 # DNS
 for n in ${DNS[@]}; do
-    ip route add $n/32 via $GATEWAY dev $DEVICE
     iptables -A INPUT  -i $DEVICE -s $n -p udp -m udp --sport 53 -j ACCEPT
     iptables -A OUTPUT -o $DEVICE -d $n -p udp -m udp --dport 53 -j ACCEPT
+    if [ "$n" = "$GATEWAY" ]; then
+        continue
+    else
+        ip route add $n/32 via $GATEWAY dev $DEVICE
+    fi
 done
 
 # UPnP / Multicast
