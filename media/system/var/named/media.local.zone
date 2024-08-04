@@ -1,0 +1,12 @@
+$TTL 300
+
+@	IN	SOA	ns1.media.local. hostmaster.media.local. (
+			2024080424	; Serial number
+			60		; Refresh every minute
+			60		; Retry every minute
+			432000		; Expire in 5 days
+			60 )		; negative caching ttl 1 minute
+	IN	NS	ns1.media.local.
+	IN	MX	10	mail.media.local.
+ns1	IN	A	192.168.100.2
+mail	IN	A	192.168.100.2

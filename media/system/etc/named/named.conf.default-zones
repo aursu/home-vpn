@@ -1,0 +1,5 @@
+// prime the server with knowledge of the root servers
+zone "." IN {
+	type hint;
+	file "named.ca";
+};

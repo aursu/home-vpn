@@ -1,0 +1,63 @@
+acl internal-networks {
+    192.168.50.0/24;  // asus
+    192.168.100.0/24; // media
+};
+
+options {
+	directory "/var/named";
+    dump-file "/var/named/data/cache_dump.db";
+	statistics-file "/var/named/data/named_stats.txt";
+	memstatistics-file "/var/named/data/named_mem_stats.txt";
+	secroots-file	"/var/named/data/named.secroots";
+	recursing-file	"/var/named/data/named.recursing";
+
+	recursion yes;
+	allow-query { localhost; internal-networks; };
+    allow-recursion { localhost; internal-networks; };
+
+	// If there is a firewall between you and nameservers you want
+	// to talk to, you may need to fix the firewall to allow multiple
+	// ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+	// If your ISP provided one or more IP addresses for stable 
+	// nameservers, you probably want to use them as forwarders.  
+	// Uncomment the following block, and insert the addresses replacing 
+	// the all-0's placeholder.
+
+	// forwarders {
+	// 	127.0.0.53;
+	// };
+
+	//========================================================================
+	// If BIND logs error messages about the root key being expired,
+	// you will need to update your keys.  See https://www.isc.org/bind-keys
+	//========================================================================
+    dnssec-validation yes;
+
+	managed-keys-directory "/var/named/dynamic";
+	geoip-directory "/usr/share/GeoIP";
+
+	pid-file "/run/named/named.pid";
+	session-keyfile "/run/named/session.key";
+
+	/* https://fedoraproject.org/wiki/Changes/CryptoPolicy */
+	include "/etc/crypto-policies/back-ends/bind.config";
+
+    listen-on { 127.0.0.1; 192.168.50.2; 192.168.100.2; };
+	// listen-on-v6 { any; };
+
+    response-policy { zone "rpz.local"; };
+
+    querylog yes;
+};
+
+logging {
+        channel queries_log {
+                file "/var/log/named/queries" versions 10 size 20m;
+                print-time yes;
+                print-category yes;
+                print-severity yes;
+                severity debug;
+        };
+        category queries { queries_log; };
+};

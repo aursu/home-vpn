@@ -1,0 +1,46 @@
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+zone "media.local" {
+    type master;
+    file "media.local.zone";
+    allow-query { any; };
+    allow-transfer { none; };
+};
+
+zone "rpz.local" {
+    type master;
+    file "db.rpz.local";
+};
+
+// Megogo DNS request forward CloudFlare
+zone "vcdn.biz" {
+    type forward;
+    forwarders { 1.1.1.1; };
+};
+
+zone "megogo.net" {
+    type forward;
+    forwarders { 1.1.1.1; };
+};
+
+// DNS requests to HDRezka forward to Google
+zone "rezka.ag" {
+    type forward;
+    forwarders { 8.8.4.4; };
+};
+
+zone "hdrezka.ac" {
+    type forward;
+    forwarders { 8.8.4.4; };
+};
+
+zone "hdrezka.ag" {
+    type forward;
+    forwarders { 8.8.4.4; };
+};
